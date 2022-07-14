@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const DiaryItem = ({
-  onRemove,
+  onEdit,
+  onDelete,
   id,
   author,
   content,
@@ -11,17 +12,34 @@ const DiaryItem = ({
   const [isEdit, setIsEdit] = useState(false);
   const toggleIsEdit = () => setIsEdit(!isEdit);
 
-  const [localContent, setLocalContent] = useState("");
+  const [localContent, setLocalContent] = useState(content);
+  const localContentInput = useRef();
 
   const handleRemove = () => {
     if (window.confirm(`${id}번째 일기를 정말 삭제하시겠습니까??`)) {
-      onRemove(id);
+      onDelete(id);
     }
   };
   const handleChangeContent = (e) => {
     setLocalContent(e.target.value);
   };
-  const handleEdit = () => {};
+  const handleQuitEdit = () => {
+    setIsEdit(false);
+    setLocalContent(content);
+  };
+
+  const handleEdit = () => {
+    if (localContent.length < 5) {
+      localContentInput.current.focus();
+      return;
+    }
+
+    if (window.confirm(`${id}번 째 일기를 수정하겠습니까?`)) {
+      onEdit(id, localContent);
+      toggleIsEdit();
+    }
+  };
+
   return (
     <div className="DiaryItem">
       <div className="info">
@@ -34,16 +52,28 @@ const DiaryItem = ({
       <div className="content">
         {isEdit ? (
           <>
-            <textarea value={localContent} onChange={handleChangeContent} />
+            <textarea
+              value={localContent}
+              onChange={handleChangeContent}
+              ref={localContentInput}
+            />
           </>
         ) : (
           <>{content}</>
         )}
       </div>
 
-      {isEdit ? (<><button onClick={toggleIsEdit}>수정취소</button></>) : ()}
-      <button onClick={handleRemove}>삭제하기</button>
-      <button onClick={toggleIsEdit}>수정하기</button>
+      {isEdit ? (
+        <>
+          <button onClick={handleQuitEdit}>수정취소</button>
+          <button onClick={handleEdit}>수정완료</button>
+        </>
+      ) : (
+        <>
+          <button onClick={handleRemove}>삭제하기</button>
+          <button onClick={toggleIsEdit}>수정하기</button>
+        </>
+      )}
     </div>
   );
 };
