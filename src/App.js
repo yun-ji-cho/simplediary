@@ -32,7 +32,6 @@ const App = () => {
   useEffect(() => {
     getData();
   }, []);
-
   const onCreate = useCallback((author, content, emotion) => {
     const created_date = new Date().getTime();
     const newItem = {
@@ -45,20 +44,17 @@ const App = () => {
     dataId.current += 1;
     setData((data) => [newItem, ...data]); //setData 에 함수를 전달하는 것을 함수형 업데이트라고 한다. 의존성 배열을 비워도 항상 최신의 state 를 인자를 통해서 참고할수 있게 하여 depth 를 비울 수 있게 한다.
   }, []);
+  const onRemove = useCallback((targetId) => {
+    setData((data) => data.filter((item) => item.id !== targetId));
+  }, []);
 
-  const onDelete = (targetId) => {
-    const newDiaryList = data.filter((item) => item.id !== targetId);
-    setData(newDiaryList);
-    console.log(newDiaryList);
-  };
-
-  const onEdit = (targetId, newContent) => {
-    setData(
+  const onEdit = useCallback((targetId, newContent) => {
+    setData((data) =>
       data.map((it) =>
         it.id === targetId ? { ...it, content: newContent } : it
       )
     );
-  };
+  }, []);
 
   const getDiaryAnalysis = useMemo(() => {
     const goodCount = data.filter((item) => item.emotion >= 3).length;
@@ -76,7 +72,7 @@ const App = () => {
       <div>기분 좋은 일기 갯수 : {goodCount}</div>
       <div>기분 나쁜 일기 갯수 : {badCount}</div>
       <div>기분 좋은 일기 비율 : {goodRatio}</div>
-      <DiaryList diaryList={data} onDelete={onDelete} onEdit={onEdit} />
+      <DiaryList diaryList={data} onRemove={onRemove} onEdit={onEdit} />
       {/* dummyList을 내려주는 것이 아니라 undefined을 내려줘서 에러가 난다면 defaultProps 를 이용한다. 기본값 설정. */}
     </div>
   );
