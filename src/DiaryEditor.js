@@ -1,6 +1,9 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const DiaryEditor = ({ onCreate }) => {
+  useEffect(() => {
+    console.log("diaryEditor 랜더");
+  });
   const authorInput = useRef(); //useRef 함수를 호출해서 반환값을 authorInput 에 담는다. (React.MutableRefObject : 돔 html 에 접근할 수 있게한다.)
   const contentInput = useRef();
   const [state, setState] = useState({
@@ -75,4 +78,4 @@ const DiaryEditor = ({ onCreate }) => {
   );
 };
 
-export default DiaryEditor;
+export default React.memo(DiaryEditor);
